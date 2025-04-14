@@ -50,6 +50,14 @@
     document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + d.toUTCString() + ";path=/";
   }
 
+  // Rename this function to avoid conflict
+  function setCookieValue(src, med) {
+    var d = new Date();
+    d.setTime(d.getTime() + exp * 864e5);
+    var v = JSON.stringify({ source: src, medium: med, metadata: meta });
+    document.cookie = cname + "=" + encodeURIComponent(v) + ";expires=" + d.toUTCString() + ";path=/";
+  }
+
   // Generate Random Experiment ID if not already set
   function generateExperimentID() {
     var experimentID = getCookie('kso_experiment_id');
@@ -92,13 +100,6 @@
     document.head.appendChild(st);
   });
 
-  function setCookie(src, med) {
-    var d = new Date();
-    d.setTime(d.getTime() + exp * 864e5);
-    var v = JSON.stringify({ source: src, medium: med, metadata: meta });
-    document.cookie = cname + "=" + encodeURIComponent(v) + ";expires=" + d.toUTCString() + ";path=/";
-  }
-
   function getParams() {
     var q = {}, qs = window.location.search.substring(1).split("&");
     for (var i = 0; i < qs.length; i++) {
@@ -111,7 +112,7 @@
   function isMatch(params) {
     var src = params.utm_source && params.utm_source.toLowerCase() === u.toLowerCase(),
         med = !m || (params.utm_medium && params.utm_medium.toLowerCase() === m.toLowerCase());
-    if (src && med) { setCookie(params.utm_source, params.utm_medium); return true; }
+    if (src && med) { setCookieValue(params.utm_source, params.utm_medium); return true; }
     var ck = getCookie();
     return !!ck && ck.source && ck.source.toLowerCase() === u.toLowerCase() && (!m || (ck.medium && ck.medium.toLowerCase() === m.toLowerCase()));
   }
